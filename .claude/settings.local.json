@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($env:Path = \"$env:ProgramFiles\\\\nodejs;$env:Path\"; npm run build 2>&1 | Select-String -Pattern \"error|✓ built\" | Select-Object -First 30)",
+      "mcp__Claude_Preview__preview_start",
+      "PowerShell($env:Path = \"$env:ProgramFiles\\\\nodejs;$env:Path\"; npm run build 2>&1 | Select-String -Pattern \"error|✓ built\" | Select-Object -First 20; Write-Output \"=== base check ===\"; Select-String -Path dist/index.html -Pattern 'src=|href=' | ForEach-Object { $_.Line.Trim\\(\\) })"
+    ]
+  }
+}
