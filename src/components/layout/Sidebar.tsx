@@ -54,10 +54,28 @@ export function Sidebar() {
   );
 }
 
-/** Mobile top nav shown below md breakpoint. */
+/** Slim top header shown below md breakpoint (brand + sync status). */
+export function MobileHeader() {
+  return (
+    <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-background/80 px-4 py-3 backdrop-blur md:hidden">
+      <div className="flex items-center gap-2">
+        <div
+          className="flex h-7 w-7 items-center justify-center rounded-lg text-white"
+          style={{ background: "linear-gradient(135deg,#8b5cf6,#06b6d4)" }}
+        >
+          <span className="text-sm font-bold">S</span>
+        </div>
+        <span className="font-semibold">StudyTracker</span>
+      </div>
+      <SyncStatus compact />
+    </header>
+  );
+}
+
+/** Bottom tab bar shown below md breakpoint — fits all items on a phone. */
 export function MobileNav() {
   return (
-    <nav className="sticky top-0 z-10 flex gap-1 border-b border-border bg-background/80 px-3 py-2 backdrop-blur md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-20 flex border-t border-border bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
       {NAV.map(({ to, label, icon: Icon, end }) => (
         <NavLink
           key={to}
@@ -65,12 +83,12 @@ export function MobileNav() {
           end={end}
           className={({ isActive }) =>
             cn(
-              "flex flex-1 items-center justify-center gap-2 rounded-lg px-2 py-2 text-sm font-medium",
-              isActive ? "bg-muted text-foreground" : "text-muted-foreground",
+              "flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium transition-colors",
+              isActive ? "text-foreground" : "text-muted-foreground",
             )
           }
         >
-          <Icon className="h-4 w-4" />
+          <Icon className="h-5 w-5" />
           {label}
         </NavLink>
       ))}
