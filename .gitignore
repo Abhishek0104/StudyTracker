@@ -5,3 +5,6 @@ dist-ssr
 .DS_Store
 .vscode/*
 !.vscode/extensions.json
+
+# Local, machine-specific Claude Code config (absolute paths, local permissions)
+.claude/
