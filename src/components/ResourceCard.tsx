@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { BookOpen, GraduationCap, Globe, Code2, ExternalLink, Pencil, Trash2, Circle } from "lucide-react";
 import type { ReadingStatus, Resource, ResourceType } from "@/data/types";
 import { PILLAR_PALETTE } from "@/data/types";
 import { useCurriculumContext } from "@/hooks/CurriculumContext";
 import { READING_STATUS_META } from "@/lib/readingStatus";
+import { faviconUrl } from "@/lib/favicon";
 import { Card } from "./ui/Card";
 import { Badge } from "./ui/Badge";
 
@@ -29,18 +31,33 @@ export function ResourceCard({ resource, status, onCycleStatus, onEdit, onDelete
   const accent = pillars[0] ? PILLAR_PALETTE[pillars[0].color] : null;
   const statusMeta = status ? READING_STATUS_META[status] : null;
   const isUser = resource.source === "user";
+  const favicon = faviconUrl(resource.url);
+  const [faviconFailed, setFaviconFailed] = useState(false);
+  const showFavicon = favicon && !faviconFailed;
 
   return (
     <Card className="flex flex-col gap-3 p-5 hover:border-muted-foreground/40">
       <div className="flex items-start justify-between gap-3">
-        <div
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-          style={{
-            background: accent ? `linear-gradient(135deg, ${accent.from}, ${accent.to})` : "hsl(var(--muted))",
-          }}
-        >
-          <Icon className="h-5 w-5 text-white" />
-        </div>
+        {showFavicon ? (
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted">
+            <img
+              src={favicon}
+              alt=""
+              className="h-5 w-5"
+              loading="lazy"
+              onError={() => setFaviconFailed(true)}
+            />
+          </div>
+        ) : (
+          <div
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+            style={{
+              background: accent ? `linear-gradient(135deg, ${accent.from}, ${accent.to})` : "hsl(var(--muted))",
+            }}
+          >
+            <Icon className="h-5 w-5 text-white" />
+          </div>
+        )}
         <div className="flex items-center gap-1.5">
           <Badge>{meta.label}</Badge>
           {isUser && (

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useCurriculumContext } from "@/hooks/CurriculumContext";
+import { suggestTitle } from "@/lib/urlTitle";
 import type { ReadingStatus, Resource, ResourceType } from "@/data/types";
 import type { ResourceDraft } from "@/hooks/useResources";
 import { Dialog } from "./ui/Dialog";
@@ -113,6 +114,12 @@ export function ResourceFormDialog({
             type="url"
             value={form.url}
             onChange={(e) => set("url", e.target.value)}
+            onBlur={() => {
+              if (!form.title.trim() && form.url.trim()) {
+                const suggestion = suggestTitle(form.url);
+                if (suggestion) set("title", suggestion);
+              }
+            }}
             placeholder="https://..."
           />
         </div>
