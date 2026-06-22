@@ -136,6 +136,20 @@ export function useResources() {
     });
   }, []);
 
+  /** Remove the given subtopic ids from every user resource's subtopicIds (curriculum delete). */
+  const detachSubtopicIds = useCallback((ids: string[]) => {
+    if (!ids.length) return;
+    const drop = new Set(ids);
+    setStore((prev) => ({
+      ...prev,
+      user: prev.user.map((r) =>
+        r.subtopicIds?.some((sid) => drop.has(sid))
+          ? { ...r, subtopicIds: r.subtopicIds.filter((sid) => !drop.has(sid)) }
+          : r,
+      ),
+    }));
+  }, []);
+
   return {
     store,
     allResources,
@@ -147,5 +161,6 @@ export function useResources() {
     cycleStatus,
     mergeStore,
     replaceStore,
+    detachSubtopicIds,
   };
 }

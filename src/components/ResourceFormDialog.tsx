@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { curriculum } from "@/data/curriculum";
+import { useCurriculumContext } from "@/hooks/CurriculumContext";
 import type { ReadingStatus, Resource, ResourceType } from "@/data/types";
 import type { ResourceDraft } from "@/hooks/useResources";
 import { Dialog } from "./ui/Dialog";
@@ -49,6 +49,7 @@ export function ResourceFormDialog({
   initialSubtopicId,
   onSubmit,
 }: Props) {
+  const { curriculum } = useCurriculumContext();
   const [form, setForm] = useState(blank);
 
   // Sync form when (re)opening.

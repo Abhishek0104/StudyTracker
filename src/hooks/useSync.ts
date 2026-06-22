@@ -2,8 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getFile, putFile, verify, SyncError, type SyncConfig } from "@/lib/githubSync";
 import { useProgressContext } from "./ProgressContext";
 import { useResourcesContext } from "./ResourcesContext";
+import { useCurriculumContext } from "./CurriculumContext";
 import type { ProgressMap } from "@/lib/progress";
 import type { ResourceStore } from "./useResources";
+import type { Pillar } from "@/data/types";
 
 const CONFIG_KEY = "studytracker.sync.v1";
 const META_KEY = "studytracker.meta.v1";
@@ -16,6 +18,7 @@ interface SyncDoc {
   updatedAt: string;
   progress: ProgressMap;
   resources: ResourceStore;
+  curriculum: Pillar[];
 }
 
 export const DEFAULT_CONFIG: SyncConfig = {
@@ -64,6 +67,7 @@ const isNetworkError = (e: unknown) => e instanceof TypeError; // fetch throws T
 export function useSync() {
   const { progress, replaceProgress } = useProgressContext();
   const { store, replaceStore } = useResourcesContext();
+  const { curriculum, replaceCurriculum } = useCurriculumContext();
 
   const [config, setConfig] = useState<SyncConfig | null>(loadConfig);
   const [status, setStatus] = useState<SyncStatus>(config ? "idle" : "disconnected");
@@ -73,6 +77,7 @@ export function useSync() {
   // Refs hold the latest values so async/debounced callbacks never go stale.
   const progressRef = useRef(progress);
   const storeRef = useRef(store);
+  const curriculumRef = useRef(curriculum);
   const configRef = useRef(config);
   const shaRef = useRef<string | null>(null);
   const metaRef = useRef<string>(loadMeta());
@@ -86,6 +91,9 @@ export function useSync() {
   useEffect(() => {
     storeRef.current = store;
   }, [store]);
+  useEffect(() => {
+    curriculumRef.current = curriculum;
+  }, [curriculum]);
   useEffect(() => {
     configRef.current = config;
   }, [config]);
@@ -103,10 +111,11 @@ export function useSync() {
       suppressTouchRef.current = true;
       replaceProgress(doc.progress ?? {});
       replaceStore(doc.resources ?? { user: [], status: {} });
+      if (Array.isArray(doc.curriculum)) replaceCurriculum(doc.curriculum);
       setLocalUpdatedAt(doc.updatedAt);
       return true;
     },
-    [replaceProgress, replaceStore],
+    [replaceProgress, replaceStore, replaceCurriculum],
   );
 
   const pull = useCallback(async (): Promise<{ existed: boolean }> => {
@@ -149,6 +158,7 @@ export function useSync() {
       updatedAt: capturedUpdatedAt,
       progress: progressRef.current,
       resources: storeRef.current,
+      curriculum: curriculumRef.current,
     };
     const json = JSON.stringify(doc, null, 2);
     try {
@@ -202,7 +212,7 @@ export function useSync() {
     setLocalUpdatedAt(now());
     schedulePush();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [progress, store]);
+  }, [progress, store, curriculum]);
 
   const connect = useCallback(
     async (cfg: SyncConfig): Promise<{ login: string }> => {

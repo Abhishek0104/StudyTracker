@@ -2,10 +2,10 @@ import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Download, Upload, ArrowRight, Flame, CheckCircle2, Layers } from "lucide-react";
-import { curriculum } from "@/data/curriculum";
 import { PILLAR_PALETTE } from "@/data/types";
 import { useProgressContext } from "@/hooks/ProgressContext";
 import { useResourcesContext } from "@/hooks/ResourcesContext";
+import { useCurriculumContext } from "@/hooks/CurriculumContext";
 import {
   overallStats,
   pillarStats,
@@ -20,6 +20,7 @@ import { PillarIcon } from "@/components/PillarIcon";
 export function Dashboard() {
   const { progress, mergeProgress } = useProgressContext();
   const { store: resourceStore, mergeStore } = useResourcesContext();
+  const { curriculum, replaceCurriculum } = useCurriculumContext();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const exportAll = () => {
@@ -28,6 +29,7 @@ export function Dashboard() {
       exportedAt: new Date().toISOString(),
       progress,
       resources: resourceStore,
+      curriculum,
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -41,10 +43,12 @@ export function Dashboard() {
   const importAll = (parsed: unknown) => {
     if (!parsed || typeof parsed !== "object") throw new Error("bad file");
     const obj = parsed as Record<string, unknown>;
-    if ("progress" in obj || "resources" in obj) {
+    if ("progress" in obj || "resources" in obj || "curriculum" in obj) {
       // New combined backup format.
       mergeProgress((obj.progress ?? {}) as Record<string, never>);
       mergeStore((obj.resources ?? {}) as Parameters<typeof mergeStore>[0]);
+      // Curriculum is structural — replace it when the backup includes one.
+      if (Array.isArray(obj.curriculum)) replaceCurriculum(obj.curriculum as Parameters<typeof replaceCurriculum>[0]);
     } else {
       // Legacy: a flat progress-only map.
       mergeProgress(obj as Record<string, never>);

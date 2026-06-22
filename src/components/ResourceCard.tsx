@@ -1,7 +1,7 @@
 import { BookOpen, GraduationCap, Globe, Code2, ExternalLink, Pencil, Trash2, Circle } from "lucide-react";
 import type { ReadingStatus, Resource, ResourceType } from "@/data/types";
 import { PILLAR_PALETTE } from "@/data/types";
-import { curriculum } from "@/data/curriculum";
+import { useCurriculumContext } from "@/hooks/CurriculumContext";
 import { READING_STATUS_META } from "@/lib/readingStatus";
 import { Card } from "./ui/Card";
 import { Badge } from "./ui/Badge";
@@ -22,6 +22,7 @@ interface ResourceCardProps {
 }
 
 export function ResourceCard({ resource, status, onCycleStatus, onEdit, onDelete }: ResourceCardProps) {
+  const { curriculum } = useCurriculumContext();
   const meta = TYPE_META[resource.type];
   const Icon = meta.icon;
   const pillars = curriculum.filter((p) => resource.pillarIds.includes(p.id));

@@ -102,6 +102,16 @@ export function useProgress() {
     setProgress(incoming && typeof incoming === "object" ? incoming : {});
   }, []);
 
+  /** Drop progress entries for the given subtopic ids (used when deleting curriculum items). */
+  const removeProgressKeys = useCallback((ids: string[]) => {
+    if (!ids.length) return;
+    setProgress((prev) => {
+      const next = { ...prev };
+      for (const id of ids) delete next[id];
+      return next;
+    });
+  }, []);
+
   const reset = useCallback(() => setProgress({}), []);
 
   return {
@@ -112,6 +122,7 @@ export function useProgress() {
     importJSON,
     mergeProgress,
     replaceProgress,
+    removeProgressKeys,
     reset,
   };
 }

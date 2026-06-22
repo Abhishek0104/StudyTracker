@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
-import { curriculum } from "@/data/curriculum";
 import { PILLAR_PALETTE, type ReadingStatus, type Resource, type ResourceType } from "@/data/types";
 import { useResourcesContext } from "@/hooks/ResourcesContext";
+import { useCurriculumContext } from "@/hooks/CurriculumContext";
 import { READING_STATUS_META } from "@/lib/readingStatus";
 import { ResourceCard } from "@/components/ResourceCard";
 import { ResourceFormDialog, type ResourceFormResult } from "@/components/ResourceFormDialog";
@@ -27,6 +27,7 @@ const STATUS_FILTERS: { value: ReadingStatus | "all"; label: string }[] = [
 export function Resources() {
   const { allResources, addResource, updateResource, deleteResource, getStatus, setStatus, cycleStatus } =
     useResourcesContext();
+  const { curriculum } = useCurriculumContext();
 
   const [pillarFilter, setPillarFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<ResourceType | "all">("all");
